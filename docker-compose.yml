@@ -9,6 +9,7 @@ services:
     volumes:
       - ./wp-data:/var/www/html
       - ./theme-dev:/var/www/html/wp-content/themes/meu-tema
+      - ./uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: wpuser
@@ -18,7 +19,7 @@ services:
       - db
 
   db:
-    image: mysql:5.7
+    image: mysql:5.7  
     container_name: wp-mysql
     volumes:
       - ./db-data:/var/lib/mysql
