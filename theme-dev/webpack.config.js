@@ -1,6 +1,7 @@
 const path = require('path');
 const glob = require('glob');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin'); 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const PAGE_SCRIPTS_PATH = './source/js/pages/';
 
@@ -57,17 +58,21 @@ module.exports = (_, argv) => {
       new MiniCssExtractPlugin({
         filename:  'css/app.min.css', 
       }),
+      new BundleAnalyzerPlugin(),
     ],
     optimization: {
+        sideEffects: false,
         usedExports: true,
         minimize: isProduction,
         splitChunks: {
             chunks: 'all',
+            minSize: 2000,
             cacheGroups: {
                 vendor: {
+                    name: 'vendors',
                     test: /[\\/]node_modules[\\/]/,
-                    name: 'vendors', 
-                    chunks: 'all',
+                    priority: -10,
+                    reuseExistingChunk: true,
                 },
             },
         },

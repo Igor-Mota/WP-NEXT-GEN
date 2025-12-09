@@ -1,6 +1,9 @@
-import Alpine from 'alpinejs'
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  Alpine.start()
-})
+document.addEventListener("DOMContentLoaded", () => {
+  import("alpinejs")
+    .then(({ default: Alpine }) => {
+      Alpine.start();
+    })
+    .catch((error) => {
+      console.error("Falha ao carregar Alpine.js dinamicamente:", error);
+    });
+});

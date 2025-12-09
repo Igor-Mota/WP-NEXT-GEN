@@ -57,26 +57,32 @@
                 <div class="mb-6 border-b border-white/20 pb-4">
                     <label class="block text-white font-semibold mb-2 text-sm sm:text-base">Mudar Gradiente da Seção</label>
 
-                    {{-- Botões de Gradiente: Aumentado para duration-500 no ring/hover --}}
+            
                     <div class="flex space-x-3 mb-3">
                          <button 
                             x-on:click="currentGradient = 'blueGreen'"
                             :class="currentGradient === 'blueGreen' ? 'ring-4 ring-white/70' : 'hover:ring-2 ring-white/50'"
-                            class="flex-1 h-10 rounded-xl transition-all duration-500 ease-in-out"
+                            class="flex-1 h-10  rounded-xl transition-all duration-500 ease-in-out"
                             style="background-image: linear-gradient(135deg, #36a4e3 0%, #38d39f 100%);"
-                        ></button>
+                        >
+                        Azul e verde
+                    </button>
                         <button 
                             x-on:click="currentGradient = 'redYellow'"
                             :class="currentGradient === 'redYellow' ? 'ring-4 ring-white/70' : 'hover:ring-2 ring-white/50'"
                             class="flex-1 h-10 rounded-xl transition-all duration-500 ease-in-out"
                             style="background-image: linear-gradient(135deg, #f05053 0%, #f6ce40 100%);"
-                        ></button>
+                        >
+                        Vermelho e amarelo
+                    </button>
                          <button 
                             x-on:click="currentGradient = 'purplePink'"
                             :class="currentGradient === 'purplePink' ? 'ring-4 ring-white/70' : 'hover:ring-2 ring-white/50'"
                             class="flex-1 h-10 rounded-xl transition-all duration-500 ease-in-out"
                             style="background-image: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);"
-                        ></button>
+                        >
+                    Rosa e roxo
+                    </button>
                     </div>
                     
                     {{-- SEGUNDA LINHA DE BOTÕES: Aumentado para duration-500 no ring/hover --}}
@@ -86,19 +92,25 @@
                             :class="currentGradient === 'yellowOrange' ? 'ring-4 ring-white/70' : 'hover:ring-2 ring-white/50'"
                             class="flex-1 h-10 rounded-xl transition-all duration-500 ease-in-out"
                             style="background-image: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);"
-                        ></button>
+                        >
+                    Amarelo e laranja
+                    </button>
                         <button 
                             x-on:click="currentGradient = 'emeraldTeal'"
                             :class="currentGradient === 'emeraldTeal' ? 'ring-4 ring-white/70' : 'hover:ring-2 ring-white/50'"
                             class="flex-1 h-10 rounded-xl transition-all duration-500 ease-in-out"
                             style="background-image: linear-gradient(135deg, #059669 0%, #14b8a6 100%);"
-                        ></button>
+                        >
+                        Esmeralda e Cerceta
+                    </button>
                         <button 
                             x-on:click="currentGradient = 'greyBlue'"
                             :class="currentGradient === 'greyBlue' ? 'ring-4 ring-white/70' : 'hover:ring-2 ring-white/50'"
                             class="flex-1 h-10 rounded-xl transition-all duration-500 ease-in-out"
                             style="background-image: linear-gradient(135deg, #94a3b8 0%, #3b82f6 100%);"
-                        ></button>
+                        >
+                        Cinza e azul
+                    </button>
                     </div>
                 </div>
 
@@ -137,10 +149,11 @@
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-white font-semibold mb-2 text-sm sm:text-base">
+                    <label for="font-size" class="block text-white font-semibold mb-2 text-sm sm:text-base">
                         Aumentar/Diminuir Fonte (<span x-text="fontSize + 'px'"></span>)
                     </label>
                     <input 
+                        id="font-size"
                         type="range" 
                         min="12" 
                         max="24" 

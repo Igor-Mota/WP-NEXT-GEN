@@ -49,7 +49,6 @@ class ImageHelper
             return '';
         }
 
-
         $finalBreakpoints = self::$breakpoints;
 
         if (!empty($settings['sizes']) && is_array($settings['sizes'])) {
@@ -60,9 +59,27 @@ class ImageHelper
         $customSizesString = self::buildSizesString($finalBreakpoints);
 
         $finalAttrs = $attrs;
+       
+        $image_src = wp_get_attachment_image_src($imageRef, $size);
+        $img_width = 0;
+        $img_height = 0;
+
+        if ($image_src) {
+            $img_width = $image_src[1];
+            $img_height = $image_src[2];
+        }
+       
         if (!isset($finalAttrs['sizes'])) {
             $finalAttrs['sizes'] = $customSizesString;
         }
+
+        if (!isset($finalAttrs['load'])) {
+            $finalAttrs['fetchpriority'] = 'high';
+            $finalAttrs['decoding'] = 'async';
+            $finalAttrs['width'] = $img_width;
+            $finalAttrs['height'] = $img_height;
+        }
+
 
         $img_html = wp_get_attachment_image($imageRef, $size, false, $finalAttrs);
 
@@ -71,8 +88,8 @@ class ImageHelper
             '$1$3',
             $img_html
         );
-        return $imageHTML;
 
+        return $imageHTML;
     }
 
     /**
@@ -81,7 +98,8 @@ class ImageHelper
      * @return string A string formatada do atributo 'sizes'.
      */
     private static function buildSizesString(array $breakpoints): string
-    {
+    {   
+        $sm = $breakpoints['sm'] ?? 375;
         $md = $breakpoints['md'] ?? 768;
         $lg = $breakpoints['lg'] ?? 1024;
         $xl = $breakpoints['xl'] ?? 1280;
@@ -94,9 +112,10 @@ class ImageHelper
             "(min-width: {$xl}px) {$xl}px",
             "(min-width: {$lg}px) {$lg}px",
             "(min-width: {$md}px) {$md}px",
-            "100vw" // Fallback
+            "(min-width: {$sm}px) {$sm}px" ,
         ];
-
+  
+        $responsiveRules[] = '100vw';
         return implode(', ', $responsiveRules);
     }
 

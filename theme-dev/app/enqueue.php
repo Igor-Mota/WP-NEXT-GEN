@@ -53,14 +53,52 @@ function wp_next_gen_enqueue()
             wp_enqueue_script(
                 $script_handle,
                 $dist_uri . $page_script_path_rel,
-                [$vendors_handle], // <--- Depende do vendors.js para rodar Alpine/Swiper
+                [$vendors_handle],
                 filemtime($page_script_path_abs),
-                true // <--- CRUCIAL: Carrega no footer (fim do body)
+                true
             );
         }
     }
-
-
 }
 
 add_action('wp_enqueue_scripts', 'wp_next_gen_enqueue');
+
+
+function wp_next_gen_add_defer_attribute($tag, $handle, $src)
+{
+
+    if ('home-js' === $handle) {
+        return $tag;
+    }
+
+    if (strpos($handle, '-js') !== false || preg_match('/.+\.js($|\?.*)/i', $src)) {
+        
+        if (strpos($tag, ' defer ') === false) {
+             return str_replace(' src', ' defer src', $tag);
+        }
+    }
+    return $tag;
+}
+
+add_filter('script_loader_tag', 'wp_next_gen_add_defer_attribute', 10, 3);
+add_filter('script_loader_tag', 'wp_next_gen_add_defer_attribute', 10, 3);
+
+
+function wp_next_gen_async_css_tag($tag, $handle) {
+    
+    if ('wp-next-gen-css' === $handle) {
+
+        $async_tag = str_replace(
+            "rel='stylesheet'", 
+            "rel='preload' as='style' onload=\"this.onload=null;this.rel='stylesheet'\"", 
+            $tag
+        );
+        $noscript_tag = '<noscript>' . str_replace("onload=\"this.onload=null;this.rel='stylesheet'\"", '', $tag) . '</noscript>';
+        
+        return $async_tag . $noscript_tag;
+    }
+
+    return $tag;
+}
+
+add_filter('style_loader_tag', 'wp_next_gen_async_css_tag', 10, 2);
