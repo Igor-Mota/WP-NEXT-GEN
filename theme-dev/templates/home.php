@@ -6,6 +6,4 @@
  * Author: Igor Mota.
  */
 
-echo blade('pages.home', [
-    'title' => get_the_title(),
-]);
+echo blade('pages.home');

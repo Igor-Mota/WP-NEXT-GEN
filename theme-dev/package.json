@@ -1,7 +1,29 @@
 {
   "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^7.0.2",
     "@tailwindcss/postcss": "^4.1.17",
+    "@types/alpinejs": "^3.13.11",
+    "@types/swiper": "^6.0.0",
+    "autoprefixer": "^10.4.22",
+    "css-loader": "^7.1.2",
+    "cssnano": "^7.1.2",
+    "mini-css-extract-plugin": "^2.9.4",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.17"
+    "postcss-loader": "^8.2.0",
+    "style-loader": "^4.0.0",
+    "tailwindcss": "^4.1.17",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "scripts": {
+    "dev": "webpack --mode development --watch",
+    "prod": "NODE_ENV=production webpack --mode production",
+    "tree": "tree -I 'node_modules|vendor'"
+  },
+  "dependencies": {
+    "alpinejs": "^3.15.2",
+    "swiper": "^12.0.3"
   }
 }

@@ -8,7 +8,8 @@ Container::make('post_meta', 'Home')
     ->add_tab('Hero', [
         
         ...carbon_image('home_banner'),
-
+        
+        Field::make('text', 'home_headline', 'Head line'),
         Field::make('text', 'home_title', 'Título da Home'),
         Field::make('textarea', 'home_subtitle', 'Subtítulo da Home'),
         Field::make('text', 'cta_text', 'Texto do Botão (CTA)')

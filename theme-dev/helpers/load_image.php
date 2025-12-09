@@ -17,6 +17,9 @@ class ImageHelper
         '3xl' => 1536
     ];
 
+    public const CACHE_DIR_NAME = 'webp-cache';
+    public const META_KEY_FLAG = '_webp_cache_exists';
+
     /**
      * Permite que o desenvolvedor customizar os breakpoints antes de usar a classe.
      * Deve ser chamado uma vez no setup do tema (functions.php).
@@ -46,26 +49,23 @@ class ImageHelper
             return '';
         }
 
-        // 1. Definição dos Breakpoints Finais: Padrões customizados pelo init()
+
         $finalBreakpoints = self::$breakpoints;
 
-        // 2. Mesclagem com Customizações Locais ($settings['sizes'])
         if (!empty($settings['sizes']) && is_array($settings['sizes'])) {
-            // Mescla os defaults (que podem já estar customizados pelo init) com os locais
+
             $finalBreakpoints = array_merge($finalBreakpoints, $settings['sizes']);
         }
 
-        // 3. Constroi a string 'sizes' (min-width)
         $customSizesString = self::buildSizesString($finalBreakpoints);
 
-        // 4. Prepara os Atributos
         $finalAttrs = $attrs;
         if (!isset($finalAttrs['sizes'])) {
             $finalAttrs['sizes'] = $customSizesString;
         }
 
-        // 5. Chamada Final do WordPress
         $img_html = wp_get_attachment_image($imageRef, $size, false, $finalAttrs);
+
         $imageHTML = preg_replace(
             '/(sizes=[\'"])(auto, )([^\'"]*)/i',
             '$1$3',
@@ -74,10 +74,6 @@ class ImageHelper
         return $imageHTML;
 
     }
-
-    // --------------------------------------------------------------------------------
-    // LÓGICA DE CONSTRUÇÃO (Método privado)
-    // --------------------------------------------------------------------------------
 
     /**
      * Constrói a string do atributo 'sizes' manualmente (min-width).
@@ -92,7 +88,6 @@ class ImageHelper
         $xxl = $breakpoints['2xl'] ?? 1366;
         $t3xl = $breakpoints['3xl'] ?? 1536;
 
-        // Construção da string (min-width, ordem descendente)
         $responsiveRules = [
             "(min-width: {$t3xl}px) {$t3xl}px",
             "(min-width: {$xxl}px) {$xxl}px",
@@ -105,15 +100,69 @@ class ImageHelper
         return implode(', ', $responsiveRules);
     }
 
-    private function verify_or_converter($image_id)
+    private static function convert_and_cache($image_id)
     {
 
-        $META_KEY_FLAG = '_webp_cache_exists';
-        $webp_exists_flag = get_post_meta($image_id, $META_KEY_FLAG, true);
-        if ($webp_exists_flag === 'yes') {
-            return true;
+        $attachment_id = $image_id;
+
+        $original_url = wp_get_attachment_url($image_id);
+
+        $webp_exists_flag = get_post_meta($image_id, self::META_KEY_FLAG, true);
+
+        $upload_dir = wp_upload_dir();
+
+        $relative_path = str_replace($upload_dir['baseurl'], '', $original_url);
+
+        $source_path = $upload_dir['basedir'] . $relative_path;
+
+        if (!$source_path || !file_exists($source_path)) {
+            return $original_url;
         }
 
-        return false;
+        $webp_filename = basename($source_path) . '.webp';
+        $cached_file_path = trailingslashit($upload_dir['basedir']) . self::CACHE_DIR_NAME . '/' . $webp_filename;
+
+        if ($attachment_id && get_post_meta($attachment_id, self::META_KEY_FLAG, true) === 'yes') {
+            if (file_exists($cached_file_path)) {
+                return trailingslashit($upload_dir['baseurl']) . self::CACHE_DIR_NAME . '/' . $webp_filename;
+            }
+        }
+
+        if (webpConverter::createWebp($source_path, $cached_file_path)) {
+
+            if ($attachment_id) {
+                update_post_meta($attachment_id, self::META_KEY_FLAG, 'yes');
+            }
+
+            return trailingslashit($upload_dir['baseurl']) . self::CACHE_DIR_NAME . '/' . $webp_filename;
+        }
+
+        return $original_url;
+    }
+
+
+    private static function adaptSrcsetForWebp(string $original_srcset_string): string
+    {
+        $upload_dir = wp_upload_dir();
+        $parts = explode(', ', $original_srcset_string);
+        $webp_sources = [];
+
+        foreach ($parts as $part) {
+            // Separa a URL da largura (ex: 'url-media.jpg 768w')
+            if (!strpos($part, ' '))
+                continue;
+            list($url, $width) = explode(' ', trim($part), 2);
+
+            // Converte a URL do JPG/PNG para a URL WebP usando o WebpConverter
+            $webp_url = WebpConverter::getWebpUrlFromOriginal($url, $upload_dir);
+
+            // O WebpConverter::processWebpConversion() precisa ser chamado para CADA tamanho 
+            // para garantir que o arquivo WebP exista ANTES de servir o srcset.
+            // Isso será feito pelo ImageHelper::load antes de construir a string.
+
+            $webp_sources[] = "{$webp_url} {$width}";
+        }
+
+        return implode(', ', $webp_sources);
     }
 }
